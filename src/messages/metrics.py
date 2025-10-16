@@ -1,10 +1,6 @@
 import abc
 from typing import Any, TypedDict
 import enum
-import re
-
-# Precompiled regex to match ASCII letters only
-_ASCII_LETTERS_RE = re.compile(r"[A-Za-z]")
 
 
 class MessageTone(str, enum.Enum):
@@ -25,6 +21,8 @@ class MessageMetric(abc.ABC):
 
 class MessageWordCountMetric(MessageMetric):
     def compute(self, message: str) -> int:
+        # TODO: Should we consider punctuation?
+        # For simplicity, we are just splitting by whitespace.
         return len(message.split())
 
     @property

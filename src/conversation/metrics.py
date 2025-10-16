@@ -113,7 +113,7 @@ class AverageMessageWordCountMetric(ConversationMetrics):
         self._count += 1
 
     def compute(self) -> float:
-        return self._total / self._count if self._count > 0 else 0.0
+        return round(self._total / self._count if self._count > 0 else 0.0, 2)
 
     @property
     def field_name(self) -> str:
