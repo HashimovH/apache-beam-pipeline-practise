@@ -1,4 +1,3 @@
-from typing import Any
 from src.messages.metrics import MessageMetricsResult, MessageToneMetric, MessageWordCountMetric
 
 

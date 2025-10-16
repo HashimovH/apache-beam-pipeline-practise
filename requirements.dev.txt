@@ -1,0 +1,143 @@
+apache-beam==2.68.0
+    # via -r requirements.in
+attrs==25.4.0
+    # via
+    #   jsonschema
+    #   referencing
+beartype==0.21.0
+    # via apache-beam
+build==1.3.0
+    # via pip-tools
+certifi==2025.10.5
+    # via requests
+charset-normalizer==3.4.4
+    # via requests
+click==8.3.0
+    # via pip-tools
+colorama==0.4.6
+    # via
+    #   build
+    #   click
+    #   pytest
+crcmod==1.7
+    # via apache-beam
+dill==0.3.1.1
+    # via apache-beam
+dnspython==2.8.0
+    # via pymongo
+docopt==0.6.2
+    # via hdfs
+fastavro==1.12.1
+    # via apache-beam
+fasteners==0.20
+    # via apache-beam
+grpcio==1.75.1
+    # via apache-beam
+hdfs==2.7.3
+    # via apache-beam
+httplib2==0.22.0
+    # via apache-beam
+idna==3.11
+    # via requests
+iniconfig==2.1.0
+    # via pytest
+jsonpickle==3.4.2
+    # via apache-beam
+jsonschema==4.25.1
+    # via apache-beam
+jsonschema-specifications==2025.9.1
+    # via jsonschema
+mypy==1.18.2
+    # via -r requirements.dev.in
+mypy-extensions==1.1.0
+    # via mypy
+numpy==2.2.6
+    # via apache-beam
+objsize==0.7.1
+    # via apache-beam
+orjson==3.11.3
+    # via apache-beam
+packaging==25.0
+    # via
+    #   apache-beam
+    #   build
+    #   pytest
+pathspec==0.12.1
+    # via mypy
+pip-tools==7.5.1
+    # via -r requirements.dev.in
+pluggy==1.6.0
+    # via pytest
+proto-plus==1.26.1
+    # via apache-beam
+protobuf==5.29.5
+    # via
+    #   apache-beam
+    #   proto-plus
+pyarrow==18.1.0
+    # via apache-beam
+pyarrow-hotfix==0.7
+    # via apache-beam
+pydot==1.4.2
+    # via apache-beam
+pygments==2.19.2
+    # via pytest
+pyjwt==2.10.1
+    # via redis
+pymongo==4.15.3
+    # via apache-beam
+pyparsing==3.2.5
+    # via
+    #   httplib2
+    #   pydot
+pyproject-hooks==1.2.0
+    # via
+    #   build
+    #   pip-tools
+pytest==8.4.2
+    # via -r requirements.dev.in
+python-dateutil==2.9.0.post0
+    # via apache-beam
+pytz==2025.2
+    # via apache-beam
+pyyaml==6.0.3
+    # via apache-beam
+redis==5.3.1
+    # via apache-beam
+referencing==0.37.0
+    # via
+    #   jsonschema
+    #   jsonschema-specifications
+regex==2025.9.18
+    # via apache-beam
+requests==2.32.5
+    # via
+    #   apache-beam
+    #   hdfs
+rpds-py==0.27.1
+    # via
+    #   jsonschema
+    #   referencing
+ruff==0.14.1
+    # via -r requirements.dev.in
+six==1.17.0
+    # via
+    #   hdfs
+    #   python-dateutil
+sortedcontainers==2.4.0
+    # via apache-beam
+typing-extensions==4.15.0
+    # via
+    #   apache-beam
+    #   grpcio
+    #   mypy
+urllib3==2.5.0
+    # via requests
+wheel==0.45.1
+    # via pip-tools
+zstandard==0.25.0
+    # via apache-beam
+
+# The following packages are considered to be unsafe in a requirements file:
+# pip
+# setuptools

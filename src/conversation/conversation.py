@@ -1,4 +1,3 @@
-from typing import Any
 from src.messages.message import Message
 from src.conversation.metrics import (
     ConversationMetrics,
