@@ -1,6 +1,10 @@
 import abc
 from typing import Any, TypedDict
 import enum
+import re
+
+# Precompiled regex to match ASCII letters only
+_ASCII_LETTERS_RE = re.compile(r"[A-Za-z]")
 
 
 class MessageTone(str, enum.Enum):
@@ -16,25 +20,25 @@ class MessageMetric(abc.ABC):
     @property
     @abc.abstractmethod
     def field_name(self) -> str:
-        """Name of the metric field in output"""
         pass
 
 
-class MessageWordCount(MessageMetric):
+class MessageWordCountMetric(MessageMetric):
     def compute(self, message: str) -> int:
-        return len(message.split(' '))
+        return len(message.split())
 
     @property
     def field_name(self) -> str:
         return "word_count"
 
 
-class MessageToneAnalysis(MessageMetric):
+class MessageToneMetric(MessageMetric):
     def compute(self, message: str) -> MessageTone:
-        first_word = message.split()[0].lower() if message else ""
-        if len(first_word) % 2 == 1:
-            return MessageTone.NEGATIVE
-        return MessageTone.POSITIVE
+        first_word = message.split()[0] if message.split() else ""
+        # TBD: After answer from PM
+        if len(first_word) % 2 == 0:
+            return MessageTone.POSITIVE
+        return MessageTone.NEGATIVE
 
     @property
     def field_name(self) -> str:

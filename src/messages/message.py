@@ -1,13 +1,13 @@
 from typing import Any
-from src.messages.metrics import MessageMetricsResult, MessageToneAnalysis, MessageWordCount
+from src.messages.metrics import MessageMetricsResult, MessageToneMetric, MessageWordCountMetric
 
 
 class Message:
     def __init__(self, content: str):
         self.content = content
         self._metrics = [
-            MessageWordCount(),
-            MessageToneAnalysis()
+            MessageWordCountMetric(),
+            MessageToneMetric()
         ]
         self._computed_metrics: MessageMetricsResult = {}
 
