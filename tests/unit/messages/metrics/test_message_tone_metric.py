@@ -1,5 +1,3 @@
-
-
 from src.messages.metrics import MessageTone, MessageToneMetric
 
 
@@ -17,7 +15,6 @@ def test_message_tone_negative_when_first_word_length_odd():
 def test_message_tone_empty_message_defaults_positive():
     metric = MessageToneMetric()
     assert metric.compute("") == MessageTone.NEGATIVE
-
 
 
 def test_message_tone_single_character_word():

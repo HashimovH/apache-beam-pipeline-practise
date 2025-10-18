@@ -19,8 +19,11 @@ class ConversationProcessorFn(beam.DoFn):
         self.error_mode = error_mode
 
     def process(self, conversation):
-        logger.info("Processing conversation by assignee_id: %s at created_at: %s",
-                    conversation.get("assignee_id"), conversation.get("created_at"))
+        logger.info(
+            "Processing conversation by assignee_id: %s at created_at: %s",
+            conversation.get("assignee_id"),
+            conversation.get("created_at"),
+        )
         try:
             conversation_obj = Conversation()
             for index, message in enumerate(conversation.get("messages", [])):
@@ -28,15 +31,16 @@ class ConversationProcessorFn(beam.DoFn):
 
                 if not content or not isinstance(content, str):
                     logging.warning(
-                        f"Invalid message content in conversation by {conversation.get('assignee_id')} at {conversation.get('created_at')}")
+                        f"Invalid message content in conversation by {conversation.get('assignee_id')} at {conversation.get('created_at')}"
+                    )
                     content = ""
 
                 message_metrics: MessageMetricsResult = conversation_obj.add_message(
-                    content)
+                    content
+                )
                 for key, value in message_metrics.items():
                     conversation["messages"][index][key] = value
 
-            # After all messages are processed, compute and attach conversation metrics
             conversation_metrics = conversation_obj.get_conversation_metrics()
             for key, value in conversation_metrics.items():
                 conversation[key] = value

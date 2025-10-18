@@ -77,5 +77,9 @@ class ConversationMetrics(abc.ABC):
 ### Future optimization
 If the team needs quite often metrics management, I would go for CLI tool which creates basic templates registers the metric in corresponding class.
 
+Another point for the metrics would be if they require external connections we might need to allow each metric to be able to dependend on another component such as `db_session` or `http_client` etc.
+
+Plus if any metric might require previous calculation data from another metric, we have to make sure of linear ordering of metrics and using some dependency logic we can inject previous calculation data to avoid double calculations. It was overkill for this assignment so I didn't do it. 
+
 
 ## How to setup locally

@@ -2,7 +2,7 @@ FROM apache/beam_python3.12_sdk:latest
 
 WORKDIR /app
 
-COPY requirements.txt requirements.dev.txt requirements.in requirements.dev.in ./
+COPY requirements.txt  ./
 
 RUN pip install --upgrade pip \
     && pip install -r requirements.txt

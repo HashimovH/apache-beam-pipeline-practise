@@ -6,6 +6,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class MessageTone(str, enum.Enum):
     POSITIVE = "positive"
     NEGATIVE = "negative"
@@ -24,6 +25,7 @@ class MessageMetric(abc.ABC):
 
 class MessageWordCountMetric(MessageMetric):
     WORD_PATTERN = re.compile(r"\b\w+\b", re.UNICODE)
+
     def compute(self, message: str) -> int:
         return len(self.WORD_PATTERN.findall(message))
 
@@ -34,14 +36,14 @@ class MessageWordCountMetric(MessageMetric):
 
 class MessageToneMetric(MessageMetric):
     FIRST_WORD_PATTERN = re.compile(r"\b\w+\b", re.UNICODE)
-    
+
     def compute(self, message: str) -> MessageTone:
         first_word_match = self.FIRST_WORD_PATTERN.search(message)
 
         if not first_word_match:
             logger.error("Empty message received for tone computation.")
             return MessageTone.NEGATIVE
-        
+
         first_word = first_word_match.group(0)
         if len(first_word) % 2 == 0:
             return MessageTone.POSITIVE

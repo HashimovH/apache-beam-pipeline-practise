@@ -3,8 +3,7 @@ from src.messages.metrics import MessageTone
 
 
 def test_message_compute_metrics_contains_expected_fields_and_values():
-    msg = Message(
-        "hello dear support team, I am stuck in the password change loop")
+    msg = Message("hello dear support team, I am stuck in the password change loop")
     metrics = msg.compute_metrics()
 
     assert "word_count" in metrics

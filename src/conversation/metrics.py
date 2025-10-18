@@ -42,7 +42,7 @@ class TotalWordCountMetric(ConversationMetrics):
         self._total = 0
 
     def update(self, message_metrics: MessageMetricsResult) -> None:
-        word_count = message_metrics.get('word_count', 0)
+        word_count = message_metrics.get("word_count", 0)
         self._total += word_count
 
     def compute(self) -> int:
@@ -63,7 +63,7 @@ class MinMessageWordCountMetric(ConversationMetrics):
         self._min = None
 
     def update(self, message_metrics: MessageMetricsResult) -> None:
-        word_count = message_metrics.get('word_count', 0)
+        word_count = message_metrics.get("word_count", 0)
         if self._min is None or word_count < self._min:
             self._min = word_count
 
@@ -85,7 +85,7 @@ class MaxMessageWordCountMetric(ConversationMetrics):
         self._max = 0
 
     def update(self, message_metrics: MessageMetricsResult) -> None:
-        word_count = message_metrics.get('word_count', 0)
+        word_count = message_metrics.get("word_count", 0)
         if word_count > self._max:
             self._max = word_count
 
@@ -108,7 +108,7 @@ class AverageMessageWordCountMetric(ConversationMetrics):
         self._count = 0
 
     def update(self, message_metrics: MessageMetricsResult) -> None:
-        word_count = message_metrics.get('word_count', 0)
+        word_count = message_metrics.get("word_count", 0)
         self._total += word_count
         self._count += 1
 
@@ -132,19 +132,19 @@ class ConversationToneMetric(ConversationMetrics):
         self._negative_count = 0
 
     def update(self, message_metrics: MessageMetricsResult) -> None:
-        tone = message_metrics.get('tone')
+        tone = message_metrics.get("tone")
         if tone == MessageTone.POSITIVE:
             self._positive_count += 1
         elif tone == MessageTone.NEGATIVE:
             self._negative_count += 1
 
-    def compute(self) -> str:
+    def compute(self) -> ConversationTone:
         if self._positive_count > self._negative_count:
-            return ConversationTone.POSITIVE.value
+            return ConversationTone.POSITIVE
         elif self._negative_count > self._positive_count:
-            return ConversationTone.NEGATIVE.value
+            return ConversationTone.NEGATIVE
         else:
-            return ConversationTone.MIXED.value
+            return ConversationTone.MIXED
 
     @property
     def field_name(self) -> str:

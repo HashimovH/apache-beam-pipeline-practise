@@ -19,3 +19,4 @@ htmlcov
 dist/
 build/
 .ruff_cache/
+junit.xml

@@ -28,10 +28,8 @@ class ConversationsToJsonFn(beam.DoFn):
 
 conversations = get_conversations()
 
-if not conversations:
-    with open("processed-data.json", "w", encoding="utf-8") as f:
-        f.write("[]\n")
-else:
+
+def run_pipeline():
     options = PipelineOptions(["--runner=DirectRunner"])
 
     with beam.Pipeline(options=options) as p:
@@ -47,3 +45,7 @@ else:
                 append_trailing_newlines=True
             )
         )
+
+
+if __name__ == "__main__":
+    run_pipeline()

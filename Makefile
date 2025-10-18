@@ -4,29 +4,22 @@ test-unit:
 	pytest -q tests/unit -c setup.cfg
 
 
-.PHONY: install install-prod lock-compile upgrade
+.PHONY: install
 install: ## Install dev requirements
 	pip install -r requirements.dev.txt
 
-install-prod: ## Install production requirements
-	pip install -r requirements.txt
-
-lock: ## Compile all requirements files
-	pip-compile --no-emit-index-url --no-header --verbose requirements.in
-	pip-compile --no-emit-index-url --no-header --verbose requirements.dev.in
-
-upgrade: ## Upgrade requirements files
-	pip-compile --no-emit-index-url --no-header --verbose --upgrade requirements.in
-	pip-compile --no-emit-index-url --no-header --verbose --upgrade requirements.dev.in 
-
-
 fmt: ## Run code formatters
-	ruff format app tests
+	ruff format src tests
 
-lint: ## Run code linters
-	ruff format app tests --check
-	ruff check app tests --fix
-	mypy app tests
+
+lint: ## Run code linters inside Docker (with apache_beam available)
+	docker run --rm --entrypoint sh -v "$(PWD)/src:/app/src" -v "$(PWD)/tests:/app/tests" ml-pipeline -c "ruff format src tests --check && ruff check src tests --fix && mypy src tests"
 
 test: ## Run unit tests with coverage
-	python -m pytest tests/unit --lf --durations=5 -c setup.cfg
+	docker run --rm --entrypoint sh -v "$(PWD):/app" ml-pipeline -c "python -m pytest tests/unit --lf --durations=5 -c setup.cfg"
+
+build:
+	docker build -t ml-pipeline .
+
+run-pipeline:
+	docker run --rm -v "$(PWD):/app" ml-pipeline
