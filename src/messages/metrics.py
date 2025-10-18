@@ -1,7 +1,10 @@
 import abc
 from typing import Any, TypedDict
 import enum
+import re
+import logging
 
+logger = logging.getLogger(__name__)
 
 class MessageTone(str, enum.Enum):
     POSITIVE = "positive"
@@ -20,10 +23,9 @@ class MessageMetric(abc.ABC):
 
 
 class MessageWordCountMetric(MessageMetric):
+    WORD_PATTERN = re.compile(r"\b\w+\b", re.UNICODE)
     def compute(self, message: str) -> int:
-        # TODO: Should we consider punctuation?
-        # For simplicity, we are just splitting by whitespace.
-        return len(message.split())
+        return len(self.WORD_PATTERN.findall(message))
 
     @property
     def field_name(self) -> str:
@@ -31,9 +33,16 @@ class MessageWordCountMetric(MessageMetric):
 
 
 class MessageToneMetric(MessageMetric):
+    FIRST_WORD_PATTERN = re.compile(r"\b\w+\b", re.UNICODE)
+    
     def compute(self, message: str) -> MessageTone:
-        first_word = message.split()[0] if message.split() else ""
-        # TBD: After answer from PM
+        first_word_match = self.FIRST_WORD_PATTERN.search(message)
+
+        if not first_word_match:
+            logger.error("Empty message received for tone computation.")
+            return MessageTone.NEGATIVE
+        
+        first_word = first_word_match.group(0)
         if len(first_word) % 2 == 0:
             return MessageTone.POSITIVE
         return MessageTone.NEGATIVE
