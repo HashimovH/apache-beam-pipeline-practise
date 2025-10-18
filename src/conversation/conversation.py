@@ -8,6 +8,7 @@ from src.conversation.metrics import (
     AverageMessageWordCountMetric,
     ConversationToneMetric
 )
+from src.messages.metrics import MessageMetricsResult
 
 
 class Conversation:
@@ -22,12 +23,14 @@ class Conversation:
         self._metric_values = {
             metric.field_name: None for metric in self._metrics}
 
-    def add_message(self, message_content: str) -> None:
+    def add_message(self, message_content: str) -> MessageMetricsResult:
         message = Message(message_content)
         message_metrics = message.compute_metrics()
 
         for metric in self._metrics:
             metric.update(message_metrics)
+
+        return message_metrics
 
     def get_conversation_metrics(self) -> ConversationMetricsResult:
         return {
