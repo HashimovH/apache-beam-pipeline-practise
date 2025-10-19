@@ -2,6 +2,7 @@ import json
 import logging
 import apache_beam as beam
 from apache_beam.options.pipeline_options import PipelineOptions
+from src.collector import ConversationsCollectorFn
 from src.logging import setup_logging
 from src.processor import ConversationProcessorFn, ErrorMode
 
@@ -29,10 +30,9 @@ def run_pipeline():
             p
             | "ReadData" >> beam.Create(read_data())
             | "ProcessConversation" >> beam.ParDo(ConversationProcessorFn(error_mode=ErrorMode.SKIP))
-            | "ConvertToJson" >> beam.ParDo(ConversationsToJsonFn())
+            | "CollecConversation" >> beam.CombineGlobally(ConversationsCollectorFn())
             | "WriteOutput" >> beam.io.WriteToText(
-                "output/processed-data.json",
-                file_name_suffix="",
+                "processed-data.json",
                 shard_name_template="",
                 append_trailing_newlines=True
             )
