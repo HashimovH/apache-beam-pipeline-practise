@@ -1,29 +1,14 @@
 import logging
 import apache_beam as beam
 from src.conversation.conversation import Conversation
-import enum
 
 from src.messages.metrics import MessageMetricsResult
 
 logger = logging.getLogger(__name__)
 
 
-class ErrorMode(enum.Enum):
-    RAISE = "raise"
-    STOP = "stop"
-    SKIP = "skip"
-
-
 class ConversationProcessorFn(beam.DoFn):
-    def __init__(self, error_mode: ErrorMode = ErrorMode.RAISE):
-        self.error_mode = error_mode
-
     def process(self, conversation):
-        logger.info(
-            "Processing conversation by assignee_id: %s at created_at: %s",
-            conversation.get("assignee_id"),
-            conversation.get("created_at"),
-        )
         try:
             conversation_obj = Conversation()
             for index, message in enumerate(conversation.get("messages", [])):
@@ -48,10 +33,4 @@ class ConversationProcessorFn(beam.DoFn):
 
         except Exception as e:
             logger.error(f"Error initializing Conversation object: {e}")
-            if self.error_mode == ErrorMode.RAISE:
-                raise
-            elif self.error_mode == ErrorMode.STOP:
-                return
-            else:
-                yield conversation
-                return
+            raise e

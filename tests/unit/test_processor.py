@@ -3,7 +3,7 @@ from apache_beam.testing.test_pipeline import TestPipeline
 import apache_beam as beam
 from src.conversation.metrics import ConversationTone
 from src.messages.metrics import MessageTone
-from src.processor import ConversationProcessorFn, ErrorMode
+from src.processor import ConversationProcessorFn
 
 
 def test_dofn_processor():
@@ -67,8 +67,6 @@ def test_dofn_processor():
     with TestPipeline() as p:
         input_pcoll = p | beam.Create(input_data)
 
-        output_pcoll = input_pcoll | beam.ParDo(
-            ConversationProcessorFn(error_mode=ErrorMode.SKIP)
-        )
+        output_pcoll = input_pcoll | beam.ParDo(ConversationProcessorFn())
 
         assert_that(output_pcoll, equal_to(expected_output))

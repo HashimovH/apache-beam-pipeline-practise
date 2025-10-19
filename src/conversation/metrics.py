@@ -29,11 +29,6 @@ class ConversationMetrics(abc.ABC):
         """Name of the metric field in output."""
         pass
 
-    @abc.abstractmethod
-    def reset(self) -> None:
-        """Reset the metric state for a new conversation."""
-        pass
-
 
 class TotalWordCountMetric(ConversationMetrics):
     """Accumulates total word count across all messages in a conversation."""
@@ -51,9 +46,6 @@ class TotalWordCountMetric(ConversationMetrics):
     @property
     def field_name(self) -> str:
         return "total_word_count"
-
-    def reset(self) -> None:
-        self._total = 0
 
 
 class MinMessageWordCountMetric(ConversationMetrics):
@@ -74,9 +66,6 @@ class MinMessageWordCountMetric(ConversationMetrics):
     def field_name(self) -> str:
         return "min_message_word_count"
 
-    def reset(self) -> None:
-        self._min = None
-
 
 class MaxMessageWordCountMetric(ConversationMetrics):
     """Tracks maximum word count among all messages in a conversation."""
@@ -95,9 +84,6 @@ class MaxMessageWordCountMetric(ConversationMetrics):
     @property
     def field_name(self) -> str:
         return "max_message_word_count"
-
-    def reset(self) -> None:
-        self._max = 0
 
 
 class AverageMessageWordCountMetric(ConversationMetrics):
@@ -118,10 +104,6 @@ class AverageMessageWordCountMetric(ConversationMetrics):
     @property
     def field_name(self) -> str:
         return "average_message_word_count"
-
-    def reset(self) -> None:
-        self._total = 0
-        self._count = 0
 
 
 class ConversationToneMetric(ConversationMetrics):
@@ -149,10 +131,6 @@ class ConversationToneMetric(ConversationMetrics):
     @property
     def field_name(self) -> str:
         return "tone"
-
-    def reset(self) -> None:
-        self._positive_count = 0
-        self._negative_count = 0
 
 
 # TODO: Similaryly this can be generated small script instead.

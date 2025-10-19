@@ -4,7 +4,8 @@ import apache_beam as beam
 from apache_beam.options.pipeline_options import PipelineOptions
 from src.collector import ConversationsCollectorFn
 from src.logging import setup_logging
-from src.processor import ConversationProcessorFn, ErrorMode
+from src.processor import ConversationProcessorFn
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -14,14 +15,8 @@ def read_data():
         return json.loads(file.read())
 
 
-class ConversationsToJsonFn(beam.DoFn):
-    """Convert conversations to JSON format"""
-
-    def process(self, element):
-        yield json.dumps(element)
-
-
 def run_pipeline():
+    start_time = time.time()
     logger.info("Starting the Beam pipeline")
     options = PipelineOptions(["--runner=DirectRunner"])
 
@@ -29,7 +24,7 @@ def run_pipeline():
         (
             p
             | "ReadData" >> beam.Create(read_data())
-            | "ProcessConversation" >> beam.ParDo(ConversationProcessorFn(error_mode=ErrorMode.SKIP))
+            | "ProcessConversation" >> beam.ParDo(ConversationProcessorFn())
             | "CollecConversation" >> beam.CombineGlobally(ConversationsCollectorFn())
             | "WriteOutput" >> beam.io.WriteToText(
                 "processed-data.json",
@@ -39,6 +34,8 @@ def run_pipeline():
         )
 
     logger.info("Beam pipeline completed successfully")
+    duration = time.time() - start_time
+    logger.info(f"Pipeline completed in {duration:.2f} seconds")
 
 
 if __name__ == "__main__":
