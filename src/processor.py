@@ -32,5 +32,11 @@ class ConversationProcessorFn(beam.DoFn):
             yield conversation
 
         except Exception as e:
-            logger.error(f"Error initializing Conversation object: {e}")
-            raise e
+            logger.error(f"Failed to process conversation: {e}")
+            yield beam.pvalue.TaggedOutput(
+                "problematic",
+                {
+                    "error": str(e),
+                    "conversation": conversation,
+                },
+            )

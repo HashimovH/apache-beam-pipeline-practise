@@ -2,6 +2,11 @@
 
 ## Technical documentation
 
+### Prerequisites
+
+- Docker
+- Make (or execute commands manually)
+
 ### How to run locally
 The application uses Docker and Makefile to simplify execution. I had a lot of problems in my machine (Windows) due to dependencies which required a lot of installation. I moved everything to Docker.
 
@@ -19,43 +24,87 @@ The application uses Docker and Makefile to simplify execution. I had a lot of p
 ### How to add new metric
 ### Message metrics
 
-`src/messages/metrics.py` file contains the list of metrics for message resource. All metrics should follow the similar convention:
+Message metrics are computed per message independently.
 
-- Inherit from `MessageMetric` base class and implement the metods
-- Suffix with `Metric` keyword for the class names.
-- Add in the initialization method of `Message` class in `src/messages/message.py` file.
+**File:** `src/messages/metrics.py`
 
-### Conversation Metrics
-Conversation metrics are more advanced than message metrics because of aggregation and accumulation logic to avoid double calculations. 
+**Steps:**
+1. Create a class inheriting from `MessageMetric`
+2. Implement `compute()` method
+3. Implement `field_name` property
+4. Add to `Message.__init__()` in `src/messages/message.py`
 
-`src/conversation/metrics.py` contains the logic of metrics.
+**Example:**
 
 ```python
-
-class ConversationMetrics(abc.ABC):
-    """Base class for conversation-level metrics that accumulate over messages."""
-
-    @abc.abstractmethod
-    def update(self, message_metrics: MessageMetricsResult) -> None:
-        """Update the metric with data from a new message."""
-        pass
-
-    @abc.abstractmethod
-    def compute(self) -> Any:
-        """Compute and return the final metric value."""
-        pass
-
+class LengthMetric(MessageMetric):
+    """Calculate message length"""
+    
     @property
-    @abc.abstractmethod
     def field_name(self) -> str:
-        """Name of the metric field in output."""
-        pass
+        return "message_length"
+    
+    def compute(self, message: str) -> int:
+        return len(message)
 ```
 
+Then add to `Message` class:
+```python
+class Message:
+    def __init__(self, content: str):
+        self.metrics = [
+            WordCountMetric(),
+            ToneMetric(),
+            LengthMetric(),  # ← Add here
+        ]
+```
 
-- Inherit from `ConversationMetrics` base class and implement the metods
-- Suffix with `Metric` keyword for the class names.
-- Add in the initialization method of `Conversation` class in `src/conversation/conversation.py` file.
+### Conversation Metrics
+Conversation metrics aggregate over messages to avoid double calculations.
+
+**File:** `src/conversation/metrics.py`
+
+**Steps:**
+1. Create a class inheriting from `ConversationMetrics`
+2. Implement `update()` to accumulate from each message
+3. Implement `compute()` to finalize the value
+4. Implement `field_name` property
+5. Add to `Conversation.__init__()` in `src/conversation/conversation.py`
+
+**Example:**
+
+```python
+class MessageCountMetric(ConversationMetrics):
+    """Count total messages in conversation"""
+    
+    def __init__(self):
+        self.count = 0
+    
+    @property
+    def field_name(self) -> str:
+        return "message_count"
+    
+    def update(self, message_metrics: MessageMetricsResult) -> None:
+        self.count += 1
+    
+    def compute(self) -> int:
+        return self.count
+```
+
+Then add to `Conversation` class:
+```python
+class Conversation:
+    def __init__(self):
+        self.metrics = [
+            TotalWordCountMetric(),
+            MinWordCountMetric(),
+            MaxWordCountMetric(),
+            AverageWordCountMetric(),
+            ToneMetric(),
+            MessageCountMetric(),  # ← Add here
+        ]
+```
+
 
 ### Future optimization for metrics
 If the team needs quite often metrics management, I would go for CLI tool which creates basic templates registers the metric in corresponding class.
@@ -85,14 +134,50 @@ Conversation Distribution (by message count):
 Why I am writing this is because of understanding does it make sense to parallelize conversations in long term planning. My understanding is that if we can avoid load imbalance yes. But current data size was not something to do very tiny improvements.
 
 
-## Future architectural improvements
+## Future improvements
 
-I have never worked with data pipelines so this thoughts are from my head.
+### Short Term
 
-- It is possible to make the runner CLI based so input and output files would have been provided.
-- Depending on the size of input files, we can bundle the conversations based on message size so distribution would be balanced between workers
-- One integration test could be added to test end to end reading, writing etc.
-- In the writing part, I gather the results in the memory and write at once, this can be improved as well based on the input data size. 
+1. **CLI Metric Generator**
+   ```bash
+   python -m src.cli.metric_generator --type message --name CustomMetric
+   ```
+   Auto-generates metric class template and registers it.
+
+2. **Metric Dependencies**
+   - Allow metrics to depend on previous metric calculations
+   - Avoid duplicate calculations
+
+3. **External Connections**
+   - Inject `db_session`, `http_client` into metrics
+   - Support metrics requiring external data
+
+
+### Long Term
+
+1. **Streaming for Large Data**
+   - Switch from batch collection to streaming writes
+
+2. **Balanced Bundling**
+   - Bundle conversations by message count
+   - Ensure even distribution across workers
+   - Improves parallelization efficiency
+
+3. **Runner Abstraction**
+   - CLI option to select runner (Direct, Spark, Dataflow)
+
+4. **Testing**
+   - End-to-end integration tests
+   - Performance benchmarks
+   - Data quality validation tests
+
+## Final words
+Pipeline will generate 3 files.
+- processed-data.json - Result of processing
+- problematic-data.json - If any conversation fails to process will be written here
+- process-stats.json - Will write overview
+
+I loved the task even though I never did ML tasks (unless CS classes).
 
 ## Assignment
 Please build a data pipeline that will:

@@ -7,6 +7,8 @@ from src.logging import setup_logging
 from src.processor import ConversationProcessorFn
 import time
 
+from src.statistics import StatsCollectorFn
+
 logger = logging.getLogger(__name__)
 
 
@@ -21,13 +23,39 @@ def run_pipeline():
     options = PipelineOptions(["--runner=DirectRunner"])
 
     with beam.Pipeline(options=options) as p:
-        (
+        processed, problematic = (
             p
             | "ReadData" >> beam.Create(read_data())
-            | "ProcessConversation" >> beam.ParDo(ConversationProcessorFn())
-            | "CollecConversation" >> beam.CombineGlobally(ConversationsCollectorFn())
-            | "WriteOutput" >> beam.io.WriteToText(
+            | "ProcessConversation" >> beam.ParDo(ConversationProcessorFn()).with_outputs(
+                "problematic", main="processed"
+            )
+        )
+
+        (
+            processed
+            | "CollectConversations" >> beam.CombineGlobally(ConversationsCollectorFn())
+            | "WriteProcessedOutput" >> beam.io.WriteToText(
                 "processed-data.json",
+                shard_name_template="",
+                append_trailing_newlines=True
+            )
+        )
+
+        (
+            problematic
+            | "CollectErrors" >> beam.CombineGlobally(ConversationsCollectorFn())
+            | "WriteProblematic" >> beam.io.WriteToText(
+                "problematic-data.json",
+                shard_name_template="",
+                append_trailing_newlines=True
+            )
+        )
+
+        (
+            processed
+            | "ComputeStats" >> beam.CombineGlobally(StatsCollectorFn())
+            | "WriteStats" >> beam.io.WriteToText(
+                "process-stats.json",
                 shard_name_template="",
                 append_trailing_newlines=True
             )

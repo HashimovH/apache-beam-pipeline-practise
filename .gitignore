@@ -20,3 +20,6 @@ dist/
 build/
 .ruff_cache/
 junit.xml
+processed-data.json
+problematic-data.json
+process-stats.json
